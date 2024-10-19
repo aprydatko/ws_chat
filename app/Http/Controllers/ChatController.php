@@ -34,7 +34,7 @@ class ChatController extends Controller
         try {
             DB::beginTransaction();
 
-            $chat = Chat::firstOrCreate([
+            $chat = Chat::updateOrCreate([
                 'users' => $userIdsString
             ], [
                 'title' => $data['title']
@@ -54,9 +54,11 @@ class ChatController extends Controller
     public function show(Chat $chat)
     {
         $users = $chat->users()->get();
-        $users = UserResource::collection($users)->resolve();
+        $messages = $chat->messages()->with('user')->get();
 
+        $messages = MessageResource::collection($messages)->resolve();
+        $users = UserResource::collection($users)->resolve();
         $chat = MessageResource::make($chat)->resolve();
-        return inertia('Chat/Show', compact('chat', 'users'));
+        return inertia('Chat/Show', compact('chat', 'users', 'messages'));
     }
 }

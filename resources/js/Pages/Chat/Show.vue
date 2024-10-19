@@ -1,9 +1,20 @@
 <template>
-    <div class="flex">
+    <div class="flex items-start">
         <div class="w-3/4 p-4 mr-4 bg-white border border-gray-200">
             <h3 class="text-gray-700 mb-4 text-lg">{{ chat.title ?? 'Your chat' }}</h3>
-            <div class="mb-4">
-
+            <div class="mb-4" v-if="messages">
+                <div v-for="message in messages" v-if="messages" :class="message.is_owner ? ' text-right': ''">
+                    <div :class="['p-2 nb-4 border inline-block',
+                    message.is_owner
+                        ? 'bg-green-50 border-green-100'
+                        : 'bg-sky-50 border-sky-100'
+                    ]">
+                        <p class="text-sm">{{ message.user_name }}</p>
+                        <p class="mb-2">{{ message.body }}</p>
+                        <p class="text-xs italic">{{ message.time }}</p>
+                        <p class="text-xs italic">{{ message.is_owner }}</p>
+                    </div>
+                </div>
             </div>
             <div>
                 <h3 class="text-gray-700 mb-4 text-lg">Send message</h3>
@@ -33,7 +44,7 @@
 import Main from '@/Layouts/Main.vue'
 export default {
     name: "Show",
-    props: ['chat', 'users'],
+    props: ['chat', 'users', 'messages'],
     layout: Main,
     data() {
         return {
@@ -57,7 +68,7 @@ export default {
                 user_ids: this.userIds
             })
             .then(res => {
-                console.log('res', res)
+                this.messages.push(res.data);
             });
         }
     }
