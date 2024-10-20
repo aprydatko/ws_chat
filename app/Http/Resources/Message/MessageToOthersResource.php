@@ -5,7 +5,7 @@ namespace App\Http\Resources\Message;
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MessageResource extends JsonResource
+class MessageToOthersResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,7 +21,7 @@ class MessageResource extends JsonResource
             'user_name' => isset($this->user) ? $this->user->name : null,
             'body' => $this->body,
             'time' => $this->time,
-            'is_owner' => $this->is_owner
+            'is_owner' => false
         ];
     }
 }

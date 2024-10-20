@@ -46,6 +46,12 @@ export default {
     name: "Show",
     props: ['chat', 'users', 'messages'],
     layout: Main,
+    created() {
+        window.Echo.channel(`store-message.${this.chat.id}`)
+            .listen('.store-message', res => {
+                this.messages.push(res.message);
+            })
+    },
     data() {
         return {
             body: ''
