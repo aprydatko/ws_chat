@@ -3,10 +3,17 @@
         <div class="w-1/2 p-4 mr-4 bg-white border border-gray-200">
             <h3 class="text-gray-700 mb-4 text-lg">Chats</h3>
             <div v-if="chats">
-                <div v-for="chat in chats" class="flex items-center pb-4 mb-4 border-b border-gray-300">
-                    <Link :href="route('chats.show', chat.id)" class="flex">
-                        <p class="mr-2">{{ chat.id }}</p>
-                        <p>{{ chat.title ?? 'Your chat' }}</p>
+                <div v-for="chat in chats" class="pb-4 mb-4 border-b border-gray-300">
+                    <Link :href="route('chats.show', chat.id)">
+                       <div class="flex justify-between">
+                           <div class="flex">
+                               <p class="mr-2">{{ chat.id }}</p>
+                               <p>{{ chat.title ?? 'Your chat' }}</p>
+                           </div>
+                           <div v-if="chat.unreadable_count != 0">
+                               <p class="text-xs rounded-full bg-sky-500 text-white px-2 py-1">{{ chat.unreadable_count }}</p>
+                           </div>
+                       </div>
                     </Link>
                 </div>
             </div>
@@ -48,6 +55,16 @@ export default {
     layout: Main,
     components: {
         Link
+    },
+    created() {
+        window.Echo.channel(`users.${this.$page.props.auth.user.id}`)
+            .listen('.store-message-status', res => {
+                this.chats.filter(chat => {
+                    if (chat.id === res.chat_id) {
+                        chat.unreadable_count = res.count;
+                    }
+                })
+            });
     },
     data() {
       return {
