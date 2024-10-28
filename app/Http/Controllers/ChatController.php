@@ -60,8 +60,11 @@ class ChatController extends Controller
 
     public function show(Chat $chat)
     {
+        $page = request('page') ?? 1;
         $users = $chat->users()->get();
-        $messages = $chat->messages()->with('user')->get();
+        $messages = $chat->messages()->with('user')
+            ->orderByDesc('created_at')
+            ->paginate(5, '*', 'page', $page);
         $chat->unreadableMessageStatuses()->update([
             'is_read' => true
         ]);

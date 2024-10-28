@@ -3,7 +3,7 @@
         <div class="w-3/4 p-4 mr-4 bg-white border border-gray-200">
             <h3 class="text-gray-700 mb-4 text-lg">{{ chat.title ?? 'Your chat' }}</h3>
             <div class="mb-4" v-if="messages">
-                <div v-for="message in messages" v-if="messages" :class="message.is_owner ? ' text-right': ''">
+                <div v-for="message in messages" v-if="messages.slice().reverse()" :class="message.is_owner ? ' text-right': ''">
                     <div :class="['p-2 nb-4 border inline-block',
                     message.is_owner
                         ? 'bg-green-50 border-green-100'
@@ -49,7 +49,7 @@ export default {
     created() {
         window.Echo.channel(`store-message.${this.chat.id}`)
             .listen('.store-message', res => {
-                this.messages.push(res.message);
+                this.messages.unshift(res.message);
                 if (this.$page.url === `/chats/${this.chat.id}`) {
                     axios.patch('/message_statuses', {
                         user_id: this.$page.props.auth.user.id,
@@ -80,7 +80,7 @@ export default {
                 user_ids: this.userIds
             })
             .then(res => {
-                this.messages.push(res.data);
+                this.messages.unshift(res.data);
                 this.body = '';
             });
         }
