@@ -3,6 +3,9 @@
         <div class="w-3/4 p-4 mr-4 bg-white border border-gray-200">
             <h3 class="text-gray-700 mb-4 text-lg">{{ chat.title ?? 'Your chat' }}</h3>
             <div class="mb-4" v-if="messages">
+                <div v-if="!isLastPage" class="text-center mb-2">
+                    <a @click.prevent="getMessages" class="inline-block bg-sky-600 text-white text-xs px-3 py-2 rounded-lg" href="#">Load more</a>
+                </div>
                 <div v-for="message in messages" v-if="messages.slice().reverse()" :class="message.is_owner ? ' text-right': ''">
                     <div :class="['p-2 nb-4 border inline-block',
                     message.is_owner
@@ -44,7 +47,7 @@
 import Main from '@/Layouts/Main.vue'
 export default {
     name: "Show",
-    props: ['chat', 'users', 'messages'],
+    props: ['chat', 'users', 'messages', 'isLastPage'],
     layout: Main,
     created() {
         window.Echo.channel(`store-message.${this.chat.id}`)
@@ -60,7 +63,8 @@ export default {
     },
     data() {
         return {
-            body: ''
+            body: '',
+            page: 1
         }
     },
     computed: {
@@ -83,6 +87,13 @@ export default {
                 this.messages.unshift(res.data);
                 this.body = '';
             });
+        },
+        getMessages() {
+            axios.get(`/chats/${this.chat.id}?page=${++this.page}`)
+                .then(res => {
+                    this.messages.push(...res.data.messages);
+                    this.$page.props.isLastPage = res.data.is_last_page;
+                })
         }
     }
 }
